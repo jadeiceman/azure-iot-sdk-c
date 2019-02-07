@@ -22,6 +22,7 @@
 #include "iothub_client_options.h"
 #include "iothub_client_version.h"
 #include "iothub_transport_ll.h"
+#include "iothubtransporthttp.h"
 #include "internal/iothub_client_authorization.h"
 #include "internal/iothub_client_private.h"
 #include "internal/iothub_client_diagnostic.h"
@@ -101,6 +102,7 @@ typedef struct IOTHUB_CLIENT_CORE_LL_HANDLE_DATA_TAG
     DLIST_ENTRY iot_msg_queue;
     DLIST_ENTRY iot_ack_queue;
     TRANSPORT_LL_HANDLE transportHandle;
+    bool isHttpTransport;
     bool isSharedTransport;
     IOTHUB_DEVICE_HANDLE deviceHandle;
     TRANSPORT_PROVIDER_FIELDS;
@@ -126,6 +128,9 @@ typedef struct IOTHUB_CLIENT_CORE_LL_HANDLE_DATA_TAG
     bool complete_twin_update_encountered;
     IOTHUB_AUTHORIZATION_HANDLE authorization_module;
     STRING_HANDLE product_info;
+#ifdef WIN32
+    STRING_HANDLE product_info_ex;
+#endif
     IOTHUB_DIAGNOSTIC_SETTING_DATA diagnostic_setting;
     SINGLYLINKEDLIST_HANDLE event_callbacks;  // List of IOTHUB_EVENT_CALLBACK's
 }IOTHUB_CLIENT_CORE_LL_HANDLE_DATA;
@@ -269,6 +274,7 @@ IOTHUB_CLIENT_EDGE_HANDLE IoTHubClientCore_LL_GetEdgeHandle(IOTHUB_CLIENT_CORE_L
 
 static void setTransportProtocol(IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* handleData, TRANSPORT_PROVIDER* protocol)
 {
+    handleData->isHttpTransport = (protocol == HTTP_Protocol());
     handleData->IoTHubTransport_SendMessageDisposition = protocol->IoTHubTransport_SendMessageDisposition;
     handleData->IoTHubTransport_GetHostname = protocol->IoTHubTransport_GetHostname;
     handleData->IoTHubTransport_SetOption = protocol->IoTHubTransport_SetOption;
@@ -460,12 +466,9 @@ static bool invoke_message_callback(IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* handleDat
     return result;
 }
 
-/*Codes_SRS_IOTHUBCLIENT_LL_10_032: ["product_info" - takes a char string as an argument to specify the product information(e.g. `"ProductName/ProductVersion"`). ]*/
-/*Codes_SRS_IOTHUBCLIENT_LL_10_034: ["product_info" - shall store the given string concatenated with the sdk information and the platform information in the form(ProductInfo DeviceSDKName / DeviceSDKVersion(OSName OSVersion; Architecture). ]*/
-static STRING_HANDLE make_product_info(const char* product)
+static STRING_HANDLE make_product_info_internal(const char* product, STRING_HANDLE pfi)
 {
     STRING_HANDLE result;
-    STRING_HANDLE pfi = platform_get_platform_info();
     if (pfi == NULL)
     {
         result = NULL;
@@ -480,8 +483,20 @@ static STRING_HANDLE make_product_info(const char* product)
         {
             result = STRING_construct_sprintf("%s %s %s", product, CLIENT_DEVICE_TYPE_PREFIX CLIENT_DEVICE_BACKSLASH IOTHUB_SDK_VERSION, STRING_c_str(pfi));
         }
-        STRING_delete(pfi);
     }
+    return result;
+}
+
+/*Codes_SRS_IOTHUBCLIENT_LL_10_032: ["product_info" - takes a char string as an argument to specify the product information(e.g. `"ProductName/ProductVersion"`). ]*/
+/*Codes_SRS_IOTHUBCLIENT_LL_10_034: ["product_info" - shall store the given string concatenated with the sdk information and the platform information in the form(ProductInfo DeviceSDKName / DeviceSDKVersion(OSName OSVersion; Architecture). ]*/
+static STRING_HANDLE make_product_info(const char* product)
+{
+    STRING_HANDLE result;
+    STRING_HANDLE pfi = platform_get_platform_info();
+
+    result = make_product_info_internal(product, pfi);
+
+    STRING_delete(pfi);
     return result;
 }
 
@@ -608,8 +623,20 @@ static const char* IoTHubClientCore_LL_GetProductInfo(void* ctx)
     else
     {
         IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* iothub_data = (IOTHUB_CLIENT_CORE_LL_HANDLE_DATA*)ctx;
+#ifdef WIN32
+        if (iothub_data->isHttpTransport || iothub_data->product_info_ex == NULL)
+        {
+            result = STRING_c_str(iothub_data->product_info);
+        }
+        else
+        {
+            result = STRING_c_str(iothub_data->product_info_ex);
+        }
+#else
         result = STRING_c_str(iothub_data->product_info);
+#endif
     }
+
     return result;
 }
 
@@ -1009,6 +1036,12 @@ static IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* initialize_iothub_client(const IOTHUB_
                         result->lastMessageReceiveTime = INDEFINITE_TIME;
                         result->data_msg_id = 1;
                         result->product_info = product_info;
+#ifdef WIN32
+                        STRING_HANDLE pfi = platform_get_platform_info_with_id();
+                        STRING_HANDLE product_info_ex = make_product_info_internal(NULL, pfi);
+                        result->product_info_ex = product_info_ex;
+                        STRING_delete(pfi);
+#endif
 
                         IOTHUB_DEVICE_CONFIG deviceConfig;
                         deviceConfig.deviceId = config->deviceId;
@@ -2247,6 +2280,12 @@ IOTHUB_CLIENT_RESULT IoTHubClientCore_LL_SetOption(IOTHUB_CLIENT_CORE_LL_HANDLE 
             else
             {
                 result = IOTHUB_CLIENT_OK;
+#ifdef WIN32
+                STRING_HANDLE pfi = platform_get_platform_info_with_id();
+                STRING_HANDLE product_info_ex = make_product_info_internal((const char*)value, pfi);
+                handleData->product_info_ex = product_info_ex;
+                STRING_delete(pfi);
+#endif
             }
         }
         else if (strcmp(optionName, OPTION_DIAGNOSTIC_SAMPLING_PERCENTAGE) == 0)
