@@ -626,8 +626,8 @@ static const char* IoTHubClientCore_LL_GetProductInfo(void* ctx)
     {
         IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* iothub_data = (IOTHUB_CLIENT_CORE_LL_HANDLE_DATA*)ctx;
         printf(">> iothub_data->product_info: %s\n", STRING_c_str(iothub_data->product_info));
-        printf(">> iothub_data->product_info_ex: %s\n", STRING_c_str(iothub_data->product_info_ex));
 #ifdef WIN32
+        printf(">> iothub_data->product_info_ex: %s\n", STRING_c_str(iothub_data->product_info_ex));
         if (iothub_data->isHttpTransport || iothub_data->product_info_ex == NULL)
         {
             printf(">> Is HTTP\n");
