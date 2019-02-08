@@ -614,27 +614,34 @@ static void IoTHubClientCore_LL_ConnectionStatusCallBack(IOTHUB_CLIENT_CONNECTIO
 
 static const char* IoTHubClientCore_LL_GetProductInfo(void* ctx)
 {
+    printf(">> Enter\n");
     const char* result;
     if (ctx == NULL)
     {
+        printf(">> Null context\n");
         result = NULL;
         LogError("invalid argument ctx %p", ctx);
     }
     else
     {
         IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* iothub_data = (IOTHUB_CLIENT_CORE_LL_HANDLE_DATA*)ctx;
+        printf(">> iothub_data->product_info: %s\n", STRING_c_str(iothub_data->product_info));
+        printf(">> iothub_data->product_info_ex: %s\n", STRING_c_str(iothub_data->product_info_ex));
 #ifdef WIN32
         if (iothub_data->isHttpTransport || iothub_data->product_info_ex == NULL)
         {
+            printf(">> Is HTTP\n");
             result = STRING_c_str(iothub_data->product_info);
         }
         else
         {
+            printf(">> Not HTTP\n");
             result = STRING_c_str(iothub_data->product_info_ex);
         }
 #else
         result = STRING_c_str(iothub_data->product_info);
 #endif
+        printf(">> result: %s\n", result);
     }
 
     return result;

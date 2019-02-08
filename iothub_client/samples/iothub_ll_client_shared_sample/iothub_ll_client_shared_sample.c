@@ -20,9 +20,9 @@
 #include "certs.h"
 #endif // SET_TRUSTED_CERT_IN_SAMPLES
 
-#define SAMPLE_AMQP
+//#define SAMPLE_AMQP
 //#define SAMPLE_AMQP_OVER_WEBSOCKETS
-//#define SAMPLE_HTTP
+#define SAMPLE_HTTP
 
 #ifdef SAMPLE_AMQP
 #include "iothubtransportamqp.h"
@@ -251,38 +251,38 @@ int main(void)
             (void)IoTHubDeviceClient_LL_SetMessageCallback(device_ll_handle2, ReceiveMessageCallback, &receiveContext2);
 
             /* Now that we are ready to receive commands, let's send some messages */
-            size_t messages_sent = 0;
-            IOTHUB_MESSAGE_HANDLE message_handle;
-            do
-            {
-                if (messages_sent < MESSAGE_COUNT)
-                {
-                    // Create the event hub message
-                    message_handle = create_events(&device1_event);
-                    (void)IoTHubDeviceClient_LL_SendEventAsync(device_ll_handle1, message_handle, SendConfirmationCallback, &device1_event);
-                    // The message is copied to the sdk so the we can destroy it
-                    IoTHubMessage_Destroy(message_handle);
+            //size_t messages_sent = 0;
+            //IOTHUB_MESSAGE_HANDLE message_handle;
+            //do
+            //{
+            //    if (messages_sent < MESSAGE_COUNT)
+            //    {
+            //        // Create the event hub message
+            //        message_handle = create_events(&device1_event);
+            //        (void)IoTHubDeviceClient_LL_SendEventAsync(device_ll_handle1, message_handle, SendConfirmationCallback, &device1_event);
+            //        // The message is copied to the sdk so the we can destroy it
+            //        IoTHubMessage_Destroy(message_handle);
 
-                    message_handle = create_events(&device2_event);
-                    (void)IoTHubDeviceClient_LL_SendEventAsync(device_ll_handle2, message_handle, SendConfirmationCallback, &device2_event);
-                    // The message is copied to the sdk so the we can destroy it
-                    IoTHubMessage_Destroy(message_handle);
+            //        message_handle = create_events(&device2_event);
+            //        (void)IoTHubDeviceClient_LL_SendEventAsync(device_ll_handle2, message_handle, SendConfirmationCallback, &device2_event);
+            //        // The message is copied to the sdk so the we can destroy it
+            //        IoTHubMessage_Destroy(message_handle);
 
-                    messages_sent++;
-                }
+            //        messages_sent++;
+            //    }
 
-                IoTHubDeviceClient_LL_DoWork(device_ll_handle1);
-                IoTHubDeviceClient_LL_DoWork(device_ll_handle2);
-                ThreadAPI_Sleep(1);
-            } while (g_continueRunning);
+            //    IoTHubDeviceClient_LL_DoWork(device_ll_handle1);
+            //    IoTHubDeviceClient_LL_DoWork(device_ll_handle2);
+            //    ThreadAPI_Sleep(1);
+            //} while (g_continueRunning);
 
-            (void)printf("client_amqp_shared_sample has gotten quit message, call DoWork %d more time to complete final sending...\r\n", DOWORK_LOOP_NUM);
-            for (size_t index = 0; index < DOWORK_LOOP_NUM; index++)
-            {
-                IoTHubDeviceClient_LL_DoWork(device_ll_handle1);
-                IoTHubDeviceClient_LL_DoWork(device_ll_handle2);
-                ThreadAPI_Sleep(1);
-            }
+            //(void)printf("client_amqp_shared_sample has gotten quit message, call DoWork %d more time to complete final sending...\r\n", DOWORK_LOOP_NUM);
+            //for (size_t index = 0; index < DOWORK_LOOP_NUM; index++)
+            //{
+            //    IoTHubDeviceClient_LL_DoWork(device_ll_handle1);
+            //    IoTHubDeviceClient_LL_DoWork(device_ll_handle2);
+            //    ThreadAPI_Sleep(1);
+            //}
 
             // Clean up the iothub sdk handle
             IoTHubDeviceClient_LL_Destroy(device_ll_handle1);
