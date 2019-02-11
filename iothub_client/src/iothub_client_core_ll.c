@@ -28,6 +28,10 @@
 #include "internal/iothub_client_diagnostic.h"
 #include "internal/iothubtransport.h"
 
+#ifdef WIN32
+#include "iothubtransporthttp.h"
+#endif
+
 #ifndef DONT_USE_UPLOADTOBLOB
 #include "internal/iothub_client_ll_uploadtoblob.h"
 #endif
@@ -129,6 +133,7 @@ typedef struct IOTHUB_CLIENT_CORE_LL_HANDLE_DATA_TAG
     IOTHUB_AUTHORIZATION_HANDLE authorization_module;
     STRING_HANDLE product_info;
 #ifdef WIN32
+    bool isHttpTransport;
     STRING_HANDLE product_info_ex;
 #endif
     IOTHUB_DIAGNOSTIC_SETTING_DATA diagnostic_setting;
@@ -274,7 +279,9 @@ IOTHUB_CLIENT_EDGE_HANDLE IoTHubClientCore_LL_GetEdgeHandle(IOTHUB_CLIENT_CORE_L
 
 static void setTransportProtocol(IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* handleData, TRANSPORT_PROVIDER* protocol)
 {
+#ifdef WIN32
     handleData->isHttpTransport = (protocol == HTTP_Protocol());
+#endif
     handleData->IoTHubTransport_SendMessageDisposition = protocol->IoTHubTransport_SendMessageDisposition;
     handleData->IoTHubTransport_GetHostname = protocol->IoTHubTransport_GetHostname;
     handleData->IoTHubTransport_SetOption = protocol->IoTHubTransport_SetOption;
