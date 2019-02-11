@@ -106,7 +106,6 @@ typedef struct IOTHUB_CLIENT_CORE_LL_HANDLE_DATA_TAG
     DLIST_ENTRY iot_msg_queue;
     DLIST_ENTRY iot_ack_queue;
     TRANSPORT_LL_HANDLE transportHandle;
-    bool isHttpTransport;
     bool isSharedTransport;
     IOTHUB_DEVICE_HANDLE deviceHandle;
     TRANSPORT_PROVIDER_FIELDS;
