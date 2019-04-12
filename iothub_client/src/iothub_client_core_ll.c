@@ -475,6 +475,7 @@ static STRING_HANDLE make_product_info(const char* product, bool IsExtraPlatform
     STRING_HANDLE pfi = platform_get_platform_info(option);
     if (pfi == NULL)
     {
+        LogError("Platform get info failed");
         result = NULL;
     }
     else
