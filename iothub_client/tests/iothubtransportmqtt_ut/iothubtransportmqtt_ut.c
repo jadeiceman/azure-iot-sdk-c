@@ -109,6 +109,7 @@ static pfIoTHubTransport_ProcessItem                IoTHubTransportMqtt_ProcessI
 static pfIoTHubTransport_Subscribe_InputQueue       IoTHubTransportMqtt_Subscribe_InputQueue;
 static pfIoTHubTransport_Unsubscribe_InputQueue     IoTHubTransportMqtt_Unsubscribe_InputQueue;
 static pfIoTHubTransport_SetCallbackContext         IoTHubTransportMqtt_SetCallbackContext;
+static pfIoTHubTransport_IsExtraPlatformInfoRequired IotHubTransportMqtt_IsExtraPlatformInfoRequired;
 
 static TRANSPORT_LL_HANDLE my_IoTHubTransport_MQTT_Common_Create(const IOTHUBTRANSPORT_CONFIG* config, MQTT_GET_IO_TRANSPORT get_io_transport, TRANSPORT_CALLBACKS_INFO* cb_info, void* ctx)
 {
@@ -353,6 +354,7 @@ TEST_SUITE_INITIALIZE(suite_init)
     IoTHubTransportMqtt_Subscribe_InputQueue = ((TRANSPORT_PROVIDER*)MQTT_Protocol())->IoTHubTransport_Subscribe_InputQueue;
     IoTHubTransportMqtt_Unsubscribe_InputQueue = ((TRANSPORT_PROVIDER*)MQTT_Protocol())->IoTHubTransport_Unsubscribe_InputQueue;
     IoTHubTransportMqtt_SetCallbackContext = ((TRANSPORT_PROVIDER*)MQTT_Protocol())->IoTHubTransport_SetCallbackContext;
+    IotHubTransportMqtt_IsExtraPlatformInfoRequired = ((TRANSPORT_PROVIDER*)MQTT_Protocol())->IoTHubTransport_IsExtraPlatformInfoRequired;
 }
 
 TEST_SUITE_CLEANUP(suite_cleanup)
@@ -910,6 +912,25 @@ TEST_FUNCTION(IoTHubTransportMqtt_SetCallbackContext_success)
     // assert
     ASSERT_ARE_EQUAL(char_ptr, umock_c_get_expected_calls(), umock_c_get_actual_calls());
     ASSERT_ARE_EQUAL(int, 0, result);
+
+    // cleanup
+}
+
+TEST_FUNCTION(IoTHubTransportMqtt_IsExtraPlatformInfoRequired_success)
+{
+    // arrange
+    IOTHUBTRANSPORT_CONFIG config = { 0 };
+    SetupIothubTransportConfig(&config, TEST_DEVICE_ID, TEST_DEVICE_KEY, TEST_IOTHUB_NAME, TEST_IOTHUB_SUFFIX, TEST_PROTOCOL_GATEWAY_HOSTNAME);
+    TRANSPORT_LL_HANDLE handle = IoTHubTransportMqtt_Create(&config, g_transport_cb_info, NULL);
+    (void)handle;
+    umock_c_reset_all_calls();
+
+    // act
+    bool result = IotHubTransportMqtt_IsExtraPlatformInfoRequired();
+
+    // assert
+    ASSERT_ARE_EQUAL(char_ptr, umock_c_get_expected_calls(), umock_c_get_actual_calls());
+    ASSERT_IS_TRUE(result);
 
     // cleanup
 }
