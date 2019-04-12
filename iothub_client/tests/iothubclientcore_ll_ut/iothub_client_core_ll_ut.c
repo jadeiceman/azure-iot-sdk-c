@@ -109,7 +109,7 @@ MOCKABLE_FUNCTION(, int, FAKE_IoTHubTransport_DeviceMethod_Response, IOTHUB_DEVI
 MOCKABLE_FUNCTION(, int, FAKE_IotHubTransport_Subscribe_InputQueue, IOTHUB_DEVICE_HANDLE, handle);
 MOCKABLE_FUNCTION(, void, FAKE_IotHubTransport_Unsubscribe_InputQueue, IOTHUB_DEVICE_HANDLE, handle);
 MOCKABLE_FUNCTION(, int, FAKE_IoTHubTransport_SetCallbackContext, TRANSPORT_LL_HANDLE, handle, void*, ctx);
-MOCKABLE_FUNCTION(, bool, FAKE_IoTHubTransport_IsExtraPlatformInfoRequired);
+MOCKABLE_FUNCTION(, bool, FAKE_IoTHubTransport_IsExtraPlatformInfoRequired, TRANSPORT_LL_HANDLE, handle);
 MOCKABLE_FUNCTION(, bool, messageInputCallbackEx, MESSAGE_CALLBACK_INFO*, messageData, void*, userContextCallback);
 
 MOCKABLE_FUNCTION(, bool, Transport_MessageCallbackFromInput, MESSAGE_CALLBACK_INFO*, messageData, void*, ctx);
@@ -1017,7 +1017,7 @@ static void setup_IoTHubClientCore_LL_create_mocks(bool use_device_config, bool 
 #endif /*USE_EDGE_MODULES*/
 
         STRICT_EXPECTED_CALL(tickcounter_create());
-        STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).CallCannotFail();
+        STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).CallCannotFail();
         STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_RETRIEVE_SQM));
         STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG)).CallCannotFail();
         STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
@@ -1653,11 +1653,10 @@ TEST_FUNCTION(IoTHubClientCore_LL_Create_fail)
     umock_c_negative_tests_snapshot();
 
     // act
-    size_t calls_cannot_fail[] = { 1, 2, 7, 8, 9, 10 };
     size_t count = umock_c_negative_tests_call_count();
     for (size_t index = 0; index < count; index++)
     {
-        if (umock_c_negative_tests_can_call_fail(i))
+        if (umock_c_negative_tests_can_call_fail(index))
         {
             umock_c_negative_tests_reset();
             umock_c_negative_tests_fail_call(index);
@@ -1732,7 +1731,7 @@ TEST_FUNCTION(IoTHubClientCore_LL_CreateWithTransport_Succeeds)
 #endif /*DONT_USE_UPLOADTOBLOB*/
     STRICT_EXPECTED_CALL(tickcounter_create());
 
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).CallCannotFail();
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).CallCannotFail();
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_RETRIEVE_SQM));
     STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG)).CallCannotFail();
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
@@ -1962,7 +1961,7 @@ TEST_FUNCTION(IoTHubClientCore_LL_CreateWithTransport_register_fails_shared_tran
 #endif /*DONT_USE_UPLOADTOBLOB*/
 
     STRICT_EXPECTED_CALL(tickcounter_create());
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).CallCannotFail();
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).CallCannotFail();
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_RETRIEVE_SQM));
     STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG)).CallCannotFail();
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
@@ -2020,7 +2019,7 @@ TEST_FUNCTION(IoTHubClientCore_LL_CreateWithTransport_set_retry_policy_fails_sha
 #endif /*DONT_USE_UPLOADTOBLOB*/
 
     STRICT_EXPECTED_CALL(tickcounter_create());
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).CallCannotFail();
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).CallCannotFail();
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_RETRIEVE_SQM));
     STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG)).CallCannotFail();
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
@@ -5398,12 +5397,12 @@ TEST_FUNCTION(IoTHubClientCore_LL_SetOption_product_info_twice_succeeds)
     IOTHUB_CLIENT_CORE_LL_HANDLE h = IoTHubClientCore_LL_Create(&TEST_CONFIG);
     umock_c_reset_all_calls();
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).SetReturn(false);
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).SetReturn(false);
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_DEFAULT));
     STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG));
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).SetReturn(false);
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).SetReturn(false);
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_DEFAULT));
     STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG));
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
@@ -5429,7 +5428,7 @@ TEST_FUNCTION(IoTHubClientCore_LL_SetOption_product_info_succeeds)
     IOTHUB_CLIENT_CORE_LL_HANDLE h = IoTHubClientCore_LL_Create(&TEST_CONFIG);
     umock_c_reset_all_calls();
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).SetReturn(false);
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).SetReturn(false);
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_DEFAULT));
     STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG));
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
@@ -5451,7 +5450,7 @@ TEST_FUNCTION(IoTHubClientCore_LL_SetOption_product_info_fails_case2)
     IOTHUB_CLIENT_CORE_LL_HANDLE h = IoTHubClientCore_LL_Create(&TEST_CONFIG);
     umock_c_reset_all_calls();
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired());
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG));
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_RETRIEVE_SQM));
 
     //act
@@ -5472,7 +5471,7 @@ TEST_FUNCTION(IoTHubClientCore_LL_SetOption_product_info_fails_case1)
     IOTHUB_CLIENT_CORE_LL_HANDLE h = IoTHubClientCore_LL_Create(&TEST_CONFIG);
     umock_c_reset_all_calls();
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));
-    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired()).SetReturn(false);
+    STRICT_EXPECTED_CALL(FAKE_IoTHubTransport_IsExtraPlatformInfoRequired(IGNORED_PTR_ARG)).SetReturn(false);
     STRICT_EXPECTED_CALL(platform_get_platform_info(PLATFORM_INFO_OPTION_DEFAULT));
     STRICT_EXPECTED_CALL(STRING_c_str(IGNORED_PTR_ARG));
     STRICT_EXPECTED_CALL(STRING_delete(IGNORED_PTR_ARG));

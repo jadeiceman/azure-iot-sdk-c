@@ -568,6 +568,7 @@ static pfIoTHubTransport_Subscribe_DeviceMethod     IoTHubTransportMqtt_WS_Subsc
 static pfIoTHubTransport_Unsubscribe_DeviceMethod   IoTHubTransportMqtt_WS_Unsubscribe_DeviceMethod;
 static pfIoTHubTransport_ProcessItem                IoTHubTransportMqtt_WS_ProcessItem;
 static pfIoTHubTransport_SetCallbackContext         IotHubTransportMqtt_WS_SetCallbackContext;
+static pfIoTHubTransport_IsExtraPlatformInfoRequired IotHubTransportMqtt_WS_IsExtraPlatformInfoRequired;
 
 static TRANSPORT_LL_HANDLE my_IoTHubTransport_MQTT_Common_Create(const IOTHUBTRANSPORT_CONFIG* config, MQTT_GET_IO_TRANSPORT get_io_transport, TRANSPORT_CALLBACKS_INFO* cb_info, void* ctx)
 {
@@ -659,6 +660,7 @@ TEST_SUITE_INITIALIZE(suite_init)
     IoTHubTransportMqtt_WS_Unsubscribe_DeviceMethod = ((TRANSPORT_PROVIDER*)MQTT_WebSocket_Protocol())->IoTHubTransport_Unsubscribe_DeviceMethod;
     IoTHubTransportMqtt_WS_ProcessItem = ((TRANSPORT_PROVIDER*)MQTT_WebSocket_Protocol())->IoTHubTransport_ProcessItem;
     IotHubTransportMqtt_WS_SetCallbackContext = ((TRANSPORT_PROVIDER*)MQTT_WebSocket_Protocol())->IoTHubTransport_SetCallbackContext;
+    IotHubTransportMqtt_WS_IsExtraPlatformInfoRequired = ((TRANSPORT_PROVIDER*)MQTT_WebSocket_Protocol())->IoTHubTransport_IsExtraPlatformInfoRequired;
 }
 
 TEST_SUITE_CLEANUP(suite_cleanup)
@@ -1278,6 +1280,24 @@ TEST_FUNCTION(IoTHubTransportMqtt_WS_Unsubscribe_DeviceTwin_success)
 
     // cleanup
     IoTHubTransportMqtt_WS_Destroy(handle);
+}
+
+TEST_FUNCTION(IoTHubTransportMqtt_WS_IsExtraPlatformInfoRequired_success)
+{
+    // arrange
+    IOTHUBTRANSPORT_CONFIG config = { 0 };
+    SetupIothubTransportConfig(&config, TEST_DEVICE_ID, TEST_DEVICE_KEY, TEST_IOTHUB_NAME, TEST_IOTHUB_SUFFIX, TEST_PROTOCOL_GATEWAY_HOSTNAME);
+    TRANSPORT_LL_HANDLE handle = IoTHubTransportMqtt_WS_Create(&config, transport_cb_info, NULL);
+    umock_c_reset_all_calls();
+
+    // act
+    bool result = IotHubTransportMqtt_WS_IsExtraPlatformInfoRequired(handle);
+
+    // assert
+    ASSERT_ARE_EQUAL(char_ptr, umock_c_get_expected_calls(), umock_c_get_actual_calls());
+    ASSERT_IS_TRUE(result);
+
+    // cleanup
 }
 
 END_TEST_SUITE(iothubtransportmqtt_ws_ut)

@@ -922,11 +922,10 @@ TEST_FUNCTION(IoTHubTransportMqtt_IsExtraPlatformInfoRequired_success)
     IOTHUBTRANSPORT_CONFIG config = { 0 };
     SetupIothubTransportConfig(&config, TEST_DEVICE_ID, TEST_DEVICE_KEY, TEST_IOTHUB_NAME, TEST_IOTHUB_SUFFIX, TEST_PROTOCOL_GATEWAY_HOSTNAME);
     TRANSPORT_LL_HANDLE handle = IoTHubTransportMqtt_Create(&config, g_transport_cb_info, NULL);
-    (void)handle;
     umock_c_reset_all_calls();
 
     // act
-    bool result = IotHubTransportMqtt_IsExtraPlatformInfoRequired();
+    bool result = IotHubTransportMqtt_IsExtraPlatformInfoRequired(handle);
 
     // assert
     ASSERT_ARE_EQUAL(char_ptr, umock_c_get_expected_calls(), umock_c_get_actual_calls());

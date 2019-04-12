@@ -1183,4 +1183,20 @@ TEST_FUNCTION(IoTHubTransportAmqp_SetCallbackContext_success)
     // cleanup
 }
 
+TEST_FUNCTION(AMQP_IsExtraPlatformInfoRequired)
+{
+    // arrange
+    TRANSPORT_PROVIDER* provider = (TRANSPORT_PROVIDER*)AMQP_Protocol_over_WebSocketsTls();
+
+    umock_c_reset_all_calls();
+
+    // act
+    bool result = provider->IoTHubTransport_IsExtraPlatformInfoRequired(TEST_TRANSPORT_LL_HANDLE);
+
+    // assert
+    ASSERT_IS_TRUE(result);
+
+    // cleanup
+}
+
 END_TEST_SUITE(iothubtransportamqp_ws_ut)
