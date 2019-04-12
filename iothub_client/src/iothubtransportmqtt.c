@@ -174,8 +174,9 @@ static int IotHubTransportMqtt_SetCallbackContext(TRANSPORT_LL_HANDLE handle, vo
     return IoTHubTransport_MQTT_SetCallbackContext(handle, ctx);
 }
 
-static bool IotHubTransportMqtt_IsExtraPlatformInfoRequired(void)
+static bool IotHubTransportMqtt_IsExtraPlatformInfoRequired(TRANSPORT_LL_HANDLE handle)
 {
+    (void)handle;
     return true;
 }
 

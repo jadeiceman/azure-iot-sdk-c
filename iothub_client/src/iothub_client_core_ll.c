@@ -988,7 +988,7 @@ static IOTHUB_CLIENT_CORE_LL_HANDLE_DATA* initialize_iothub_client(const IOTHUB_
                     result = NULL;
                 }
                 // Add extended info to product info if required
-                else if ((result->product_info = make_product_info(NULL, result->IoTHubTransport_IsExtraPlatformInfoRequired())) == NULL)
+                else if ((result->product_info = make_product_info(NULL, result->IoTHubTransport_IsExtraPlatformInfoRequired(result->transportHandle))) == NULL)
                 {
                     LogError("failed to initialize product info");
                     // Codes_SRS_IOTHUBCLIENT_LL_09_010: [ If any failure occurs `IoTHubClientCore_LL_Create` shall destroy the `transportHandle` only if it has created it ]
@@ -2244,7 +2244,7 @@ IOTHUB_CLIENT_RESULT IoTHubClientCore_LL_SetOption(IOTHUB_CLIENT_CORE_LL_HANDLE 
             }
 
             /*Codes_SRS_IOTHUBCLIENT_LL_10_035: [If string concatenation fails, `IoTHubClientCore_LL_SetOption` shall return `IOTHUB_CLIENT_ERRROR`. Otherwise, `IOTHUB_CLIENT_OK` shall be returned. ]*/
-            handleData->product_info = make_product_info((const char*)value, handleData->IoTHubTransport_IsExtraPlatformInfoRequired());
+            handleData->product_info = make_product_info((const char*)value, handleData->IoTHubTransport_IsExtraPlatformInfoRequired(handleData->transportHandle));
             if (handleData->product_info == NULL)
             {
                 LogError("STRING_construct_sprintf failed");

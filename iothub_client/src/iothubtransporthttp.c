@@ -2507,8 +2507,9 @@ int IoTHubTransportHttp_SetCallbackContext(TRANSPORT_LL_HANDLE handle, void* ctx
     return result;
 }
 
-static bool IoTHubTransportHttp_IsExtraPlatformInfoRequired(void)
+static bool IoTHubTransportHttp_IsExtraPlatformInfoRequired(TRANSPORT_LL_HANDLE handle)
 {
+    (void)handle;
     // Do not include extended product information in HTTP requests
     return false;
 }

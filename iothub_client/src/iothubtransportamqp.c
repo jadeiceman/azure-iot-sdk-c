@@ -182,8 +182,9 @@ static int IoTHubTransportAMQP_SetCallbackContext(TRANSPORT_LL_HANDLE handle, vo
     return IoTHubTransport_AMQP_SetCallbackContext(handle, ctx);
 }
 
-static bool IoTHubTransportAMQP_IsExtraPlatformInfoRequired(void)
+static bool IoTHubTransportAMQP_IsExtraPlatformInfoRequired(TRANSPORT_LL_HANDLE handle)
 {
+    (void)handle;
     return true;
 }
 

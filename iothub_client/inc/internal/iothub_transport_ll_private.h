@@ -91,7 +91,7 @@ extern "C"
     typedef int(*pfIoTHubTransport_Subscribe_InputQueue)(IOTHUB_DEVICE_HANDLE handle);
     typedef void(*pfIoTHubTransport_Unsubscribe_InputQueue)(IOTHUB_DEVICE_HANDLE handle);
     typedef int(*pfIoTHubTransport_SetCallbackContext)(TRANSPORT_LL_HANDLE handle, void* ctx);
-    typedef bool(*pfIoTHubTransport_IsExtraPlatformInfoRequired)(void);
+    typedef bool(*pfIoTHubTransport_IsExtraPlatformInfoRequired)(TRANSPORT_LL_HANDLE handle);
 
 #define TRANSPORT_PROVIDER_FIELDS                                                   \
 pfIotHubTransport_SendMessageDisposition IoTHubTransport_SendMessageDisposition;    \
